@@ -4,19 +4,19 @@ namespace App\Models\Usuarios;
 
 use CodeIgniter\Model;
 
-class UsuariosModel extends Model
+class UserModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'usuarios';
+    protected $table            = 'users';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = 'object';
-    protected $useSoftDeletes   = true;
+    protected $returnType       = 'array';
+    protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['nombre', 'apellido', 'email', 'password'];
-
+    protected $allowedFields = ['username', 'email', 'password', 'nombre', 'apellidos', 'role_id', 'active', 'deactivated_at'];
+    
     // Dates
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -38,4 +38,9 @@ class UsuariosModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function role()
+    {
+        return $this->belongsTo(RoleModel::class, 'role_id');
+    }
 }

@@ -8,23 +8,29 @@ class UserSeeder extends Seeder
 {
     public function run()
     {
-        $us = new \App\Models\Usuarios\Usuarios();
+        $us = new \App\Models\Usuarios\User();
 
         // Array de usuarios
         $usuarios = [
             [
+                'username' => 'superadmin',
+                'role_id' => 1,
                 'nombre' => 'Super',
                 'apellido' => 'Administrador',
                 'email' => 'superadmin@geoshglobal.com',
                 'password' => password_hash('@Dyj21278370', PASSWORD_DEFAULT),
             ],
             [
+                'username' => 'admin',
+                'role_id' => 2,
                 'nombre' => 'Administrador',
                 'apellido' => 'Administrador',
                 'email' => 'admin@geoshglobal.com',
                 'password' => password_hash('@AdminGg2023', PASSWORD_DEFAULT),
             ],
             [
+                'username' => 'user',
+                'role_id' => 3,
                 'nombre' => 'Usuario',
                 'apellido' => 'Usuario',
                 'email' => 'user@geoshglobal.com',
