@@ -28,7 +28,9 @@ class Filters extends BaseConfig
         'basicAuthFilter'  => \App\Filters\BasicAuthFilter::class,
         'timezone'  => \App\Filters\TimezoneFilter::class,
         'bearerToken' => \App\Filters\BearerTokenFilter::class,
+        'verificarPermiso' => \App\Filters\VerificarPermiso::class,
     ];
+
 
     /**
      * List of filter aliases that are always
@@ -71,5 +73,7 @@ class Filters extends BaseConfig
      * Example:
      * 'isLoggedIn' => ['before' => ['account/*', 'profiles/*']]
      */
-    public array $filters = [];
+    public array $filters = [
+        'basicAuthFilter' => ['before' => ['auth/*']],
+    ];
 }

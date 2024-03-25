@@ -8,7 +8,7 @@ class UserSeeder extends Seeder
 {
     public function run()
     {
-        $us = new \App\Models\Usuarios\User();
+        $us = model('App\Models\Usuarios\UserModel');
 
         // Array de usuarios
         $usuarios = [
@@ -41,11 +41,6 @@ class UserSeeder extends Seeder
 
         // Using Query Builder
         $us->insertBatch($usuarios);
-
-        // Establece roles para cada usuario del array
-        $this->db->table('usuarios')->set('role_id', 1)->where('email', 'superadmin@geoshglobal.com')->update();
-        $this->db->table('usuarios')->set('role_id', 2)->where('email', 'admin@geoshglobal.com')->update();
-        $this->db->table('usuarios')->set('role_id', 3)->where('email', 'user@geoshglobal.com')->update();
 
 
     }

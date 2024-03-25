@@ -3,13 +3,12 @@
 namespace App\Database\Seeds;
 
 use CodeIgniter\Database\Seeder;
-use App\Models\Usuarios\Roles;
 
 class RoleSeeder extends Seeder
 {
     public function run()
     {
-        $sm = new Role();
+        $sm = model('App\Models\Usuarios\RoleModel');
 
         // Array de roles
         $roles = [

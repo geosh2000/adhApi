@@ -33,7 +33,7 @@ class CreateUsersTable extends Migration
                 'type' => 'VARCHAR',
                 'constraint' => 255,
             ],
-            'apellidos' => [
+            'apellido' => [
                 'type' => 'VARCHAR',
                 'constraint' => 255,
             ],
@@ -48,12 +48,9 @@ class CreateUsersTable extends Migration
             ],
             'created_at' => [
                 'type' => 'DATETIME',
-                'default' => 'CURRENT_TIMESTAMP',
             ],
             'updated_at' => [
                 'type' => 'TIMESTAMP',
-                'default' => 'CURRENT_TIMESTAMP',
-                'on update' => 'CURRENT_TIMESTAMP',
             ],
             'deactivated_at' => [
                 'type' => 'DATETIME',

@@ -45,6 +45,26 @@ class Database extends Config
         'numberNative' => false,
     ];
 
+    public array $adh_crs = [
+        'DSN'          => '',
+        'hostname'     => 'atelier-hoteles.database.windows.net',
+        'username'     => 'CVReports3',
+        'password'     => '7ZUMPHoLR7$8',
+        'database'     => 'Atelier_Front_CRS',
+        'DBDriver'     => 'sqlsrv',
+        'DBPrefix'     => '',
+        'pConnect'     => false,
+        'DBDebug'      => true,
+        'charset'      => 'utf8',
+        'DBCollat'     => 'utf8_general_ci',
+        'swapPre'      => '',
+        'encrypt'      => false,
+        'compress'     => false,
+        'strictOn'     => false,
+        'failover'     => [],
+        'numberNative' => false,
+    ];
+
     /**
      * This database connection is used when
      * running PHPUnit database tests.

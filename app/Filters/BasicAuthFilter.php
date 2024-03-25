@@ -3,61 +3,71 @@
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Filters\FilterInterface;
-use App\Models\ClientesModel;
-use App\Libraries\Authentication;
+use App\Libraries\JWT\Key as jkey;
+use App\Libraries\JWT\JWT;
+use App\Models\Logs\TokenModel;
+use Config\Globals as JWTConfig;
 
 date_default_timezone_set('America/Cancun');
 
 class BasicAuthFilter implements FilterInterface
 {
+
     public function before(RequestInterface $request, $arguments = null)
     {
-        helper('common');
+        // Establecer la zona horaria de la base de datos
+        $db = db_connect();
+        $db->query("SET time_zone = '-05:00';"); // Ajusta esto según la zona horaria deseada
 
-        // Revisa si existen credenciales
-        if( empty($_SERVER['PHP_AUTH_USER'])){
-            gg_die('Servicio no autorizado, token no recibido');
+        // Verificar si se ha proporcionado un token
+        $token = $request->getHeaderLine('Authorization');
+
+        if (!$token) {
+            return service('response')->setStatusCode(401)->setJSON(['message' => 'Token no proporcionado']);
         }
 
-        // Asigna las credenciales a variables
-        $username = $_SERVER['PHP_AUTH_USER'];
-        $password = $_SERVER['PHP_AUTH_PW'];
+        // Eliminar el prefijo "Bearer " del token
+        $token = str_replace('Bearer ', '', $token);
 
-        // Obtiene el modelo de clientes
-        $cm = new ClientesModel();
-        $cliente = $cm->where('id_cliente', $username)->first();
-
-        // Si no existe el cliente
-        if( empty($cliente) ){
-            gg_die('Servicio no autorizado, id_cliente no existe');
+        // Decodificar el token JWT
+        try {
+            $key = JWTConfig::$jwtKey;
+            $JK = new jkey($key, 'HS256');
+            $decoded = JWT::decode($token, $JK);
+        } catch (\Exception $e) {
+            return service('response')->setStatusCode(401)->setJSON(['message' => 'Token inválido key']);
         }
 
-        // Compara credenciales con id_cliente y llave_secreta
-        if( empty($cliente) || $cliente['llave_secreta'] != $password ){
-            gg_die('Servicio no autorizado, credenciales incorrectas');
+        // Verificar si el token existe y está activo en la base de datos
+        $tokenModel = new TokenModel();
+        $tokenRecord = $tokenModel->where('token', $token)->first();
+
+        if (!$tokenRecord ) {
+            // Si el token no existe, no está activo, ha expirado o no se ha utilizado en la última hora, lo marcamos como inválido
+            if ($tokenRecord) {
+                $tokenModel->delete($tokenRecord['id']);
+            }
+            return service('response')->setStatusCode(401)->setJSON(['message' => 'Token inválido mysq' ]);
         }
 
-        // Obtiene el modelo de autenticacion
-        $auth = new Authentication();
-
-        // Obtiene los datos del cliente de la sesion
-        $credentials = $auth->getCredentials();
-
-        // Compara si las credenciales de la sesion son iguales a las credenciales recibidas
-        if( $credentials['id_cliente'] != $username || $credentials['llave_secreta'] != $password ){
-            gg_die('Servicio no autorizado, credenciales incorrectas, debes iniciar sesion en este equipo para poder usar el servicio');
+        if (!$tokenRecord || strtotime($tokenRecord['updated_at']) < (time() - 3600) || $decoded->exp < time()) {
+            // Si el token no existe, no está activo, ha expirado o no se ha utilizado en la última hora, lo marcamos como inválido
+            if ($tokenRecord) {
+                $tokenModel->delete($tokenRecord['id']);
+            }
+            return service('response')->setStatusCode(401)->setJSON(['message' => 'Token inválido time', 'token' => $tokenRecord, 'decoded' => $decoded, 'time' => time()]);
         }
 
-        // Compara la fecha actual con el valid_until de las $credentials
-        if( strtotime($credentials['valid_until']) < strtotime(date('Y-m-d H:i:s')) ){
-            gg_die('Servicio no autorizado, credenciales expiradas, debes iniciar sesion nuevamente para poder usar el servicio');
-        }
+        // Si el token es válido, activo y se ha utilizado en la última hora, actualizamos updated_at
+        $tokenModel->update($tokenRecord['id'], ['updated_at' => date('Y-m-d H:i:s')]);
 
-
+        // Pasamos la solicitud
+        return $request;
     }
+
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        // Code to be executed after the controller method
+        // No es necesario implementar este método en este filtro
     }
 }
