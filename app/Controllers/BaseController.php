@@ -9,6 +9,10 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
+use CodeIgniter\Database\Config;
+use CodeIgniter\Database\Query;
+
+
 /**
  * Class BaseController
  *
@@ -49,6 +53,10 @@ abstract class BaseController extends Controller
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         $this->helpers = array_merge($this->helpers, ['setting']);
+
+        // Carga el helper common
+        helper(['common']);
+        helper(['database']);
 
         // Do Not Edit This Line
         parent::initController($request, $response, $logger);

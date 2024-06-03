@@ -30,7 +30,7 @@ class Database extends Config
         'username'     => 'cycoasis_apirest_admin',
         'password'     => '@8370Apirest',
         'database'     => 'cycoasis_apirest',
-        'DBDriver'     => 'MySQLi',
+        'DBDriver'     => '',
         'DBPrefix'     => '',
         'pConnect'     => false,
         'DBDebug'      => true,
@@ -44,14 +44,14 @@ class Database extends Config
         'port'         => 3306,
         'numberNative' => false,
     ];
-
-    public array $adh_crs = [
+   
+    public array $mysql = [
         'DSN'          => '',
-        'hostname'     => 'atelier-hoteles.database.windows.net',
-        'username'     => 'CVReports3',
-        'password'     => '7ZUMPHoLR7$8',
-        'database'     => 'Atelier_Front_CRS',
-        'DBDriver'     => 'sqlsrv',
+        'hostname'     => '127.0.0.1',
+        'username'     => 'root',
+        'password'     => 'root',
+        'database'     => 'adh_api',
+        'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => false,
         'DBDebug'      => true,
@@ -62,19 +62,61 @@ class Database extends Config
         'compress'     => false,
         'strictOn'     => false,
         'failover'     => [],
+        'port'         => 8889,
         'numberNative' => false,
+    ];
+    
+    public array $adh_wh = [
+        'DSN'          => '',
+        'hostname'      => 'tcp:atelier-datawarehouse.database.windows.net', // Aquí se especifica el protocolo TCP para Azure SQL Database
+        'username'     => 'CVReports3',
+        'password'     => '7ZUMPHoLR7$8',
+        'database'     => 'DataWareHouse',
+        'DBDriver'     => 'SQLSRV',
+        'DBPrefix'     => '',
+        'pConnect' => false,
+        'DBDebug'  => (ENVIRONMENT !== 'production'),
+        'cacheOn'  => false,
+        'cacheDir' => '',
+        'charset'  => 'utf8',
+        'DBCollat' => 'utf8_general_ci',
+        'swapPre'  => '',
+        'encrypt'  => true, // Se recomienda utilizar el cifrado SSL para conexiones seguras a Azure SQL Database
+        'compress' => false,
+        'strictOn' => false,
+        'failover' => [],
+    ];
+    public array $adh_crs = [
+        'DSN'          => '',
+        'hostname'      => 'tcp:atelier-hoteles.database.windows.net', // Aquí se especifica el protocolo TCP para Azure SQL Database
+        'username'     => 'CVReports3',
+        'password'     => '7ZUMPHoLR7$8',
+        'database'     => 'Atelier_Front_CRS',
+        'DBDriver'     => 'SQLSRV',
+        'DBPrefix'     => '',
+        'pConnect' => false,
+        'DBDebug'  => (ENVIRONMENT !== 'production'),
+        'cacheOn'  => false,
+        'cacheDir' => '',
+        'charset'  => 'utf8',
+        'DBCollat' => 'utf8_general_ci',
+        'swapPre'  => '',
+        'encrypt'  => true, // Se recomienda utilizar el cifrado SSL para conexiones seguras a Azure SQL Database
+        'compress' => false,
+        'strictOn' => false,
+        'failover' => [],
     ];
 
     /**
      * This database connection is used when
      * running PHPUnit database tests.
      */
-    public array $tests = [
+    public array $production = [
         'DSN'         => '',
-        'hostname'    => 'localhost',
+        'hostname'    => '65.99.248.168',
         'username'     => 'cycoasis_apirest_admin',
         'password'     => '@8370Apirest',
-        'database'    => 'cycoasis_apirest',
+        'database'    => 'cycoasis_adh',
         'DBDriver'    => 'MySQLi',
         'DBPrefix'    => '',  // Needed to ensure we're working correctly with prefixes live. DO NOT REMOVE FOR CI DEVS
         'pConnect'    => false,
@@ -91,9 +133,17 @@ class Database extends Config
         'busyTimeout' => 1000,
     ];
 
+    public $validDrivers = [
+        'mysqli' => 'App\Libraries\Database\MyDBMysqliDriver',
+        // Add other valid drivers here if needed
+    ];
+
     public function __construct()
     {
         parent::__construct();
+
+        // Set the subclass prefix for custom database drivers
+        $this->subclassPrefix = 'MY_';
 
         // Ensure that we always set the database group to 'tests' if
         // we are currently running an automated test suite, so that

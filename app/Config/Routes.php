@@ -8,10 +8,99 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Registro::index');
 $routes->get('logout', 'Registro::logout');
 
-// Upload CSV
-$routes->get('csv/upload', 'CsvUpload::index');
-$routes->post('csv/upload', 'CsvUpload::upload');
+$routes->group('third', function($routes){
+    $routes->get('industrias', 'Third\Industrias::index');
+});
 
+$routes->group('reports', function($routes){
+    $routes->get('uk', 'Reports\Promos::promoUk');
+    $routes->post('uk', 'Reports\Promos::promoUk');
+});
+
+// CallitOnce
+$routes->group('cio', function($routes){
+    $routes->get('llamadas', 'Cio\UploadCalls::mostrarFormulario');
+    $routes->post('llamadas/cargar', 'Cio\UploadCalls::cargarCSV');
+    $routes->get('load', 'Cio\UploadCalls::loadCSV');
+    
+    $routes->group('query', function($routes){
+        $routes->get('todayCalls', 'Cio\QueryCalls::llamadasDia');
+    });
+    
+    $routes->group('dashboard', function($routes){
+        $routes->get('', 'Cio\QueryCalls::test');
+        $routes->get('disposicion', 'Cio\QueryCalls::types');
+        $routes->get('disposicion/(:any)', 'Cio\QueryCalls::types/$1');
+        $routes->get('disposicion/(:any)/(:any)', 'Cio\QueryCalls::types/$1/$2');
+        $routes->get('disposicion/(:any)/(:any)/(:any)', 'Cio\QueryCalls::types/$1/$2/$3');
+        $routes->get('queues', 'Cio\QueryCalls::queues');
+        $routes->get('langs', 'Cio\QueryCalls::langs');
+        $routes->get('hotels', 'Cio\QueryCalls::hotels');
+        $routes->get('callJourney', 'Cio\QueryCalls::callJourney');
+        $routes->get('calls', 'Cio\QueryCalls::calls');
+        $routes->get('calls/(:any)', 'Cio\QueryCalls::calls/$1/');
+        $routes->get('calls/(:any)/(:any)/(:any)', 'Cio\QueryCalls::calls/$1/$2/$3');
+    });
+});
+
+// Transportacion
+$routes->group('transpo', function($routes){
+    $routes->get('reservation', 'Transpo\TransportacionController::index');
+    $routes->get('create', 'Transpo\TransportacionController::create');
+    $routes->post('store', 'Transpo\TransportacionController::store');
+    $routes->get('edit/(:num)', 'Transpo\TransportacionController::edit/$1');
+    $routes->get('confirmDelete/(:num)', 'Transpo\TransportacionController::confirmDelete/$1');
+    $routes->post('update/(:num)', 'Transpo\TransportacionController::update/$1');
+    $routes->delete('delete/(:num)', 'Transpo\TransportacionController::delete/$1');
+});
+
+// Zendesk
+$routes->group('zd', function($routes){
+    $routes->group('mailing', function($routes){
+        $routes->get('conf', 'Zd\Mailing::index');
+        $routes->get('confHtml', 'Zd\Mailing::getConf');
+    });
+    $routes->group('object', function($routes){
+        $routes->get('show', 'Zd\Objects::index');
+    });
+    $routes->group('user', function($routes){
+        $routes->get('get/(:any)', 'Zd\Users::showUser/$1');
+    });
+    $routes->group('ticket', function($routes){
+        $routes->get('show', 'Zd\Tickets::index');
+        $routes->get('show/(:any)', 'Zd\Tickets::index/$1');
+        $routes->get('adhForm/(:any)', 'Zd\Tickets::adhFormToClient/$1');
+        $routes->get('audits/(:any)', 'Zd\Tickets::audits/$1');
+        $routes->get('fields', 'Zd\Tickets::showFields');
+        $routes->delete('closeTicket/(:any)', 'Zd\Tickets::closeTicket/$1');
+    });
+    $routes->post('webhook', 'Zd\Tickets::webhook');
+});
+
+$routes->group('view', function($routes){
+    $routes->group('reports', function($routes){
+        $routes->get('uk', 'Reports\Promos::promoUk/true');
+        $routes->post('uk', 'Reports\Promos::promoUk/true');
+    });
+});
+
+
+// Upload CSV
+$routes->group('rsv', function($routes){
+    $routes->get('search', 'Rsv\Manager::index');
+    $routes->post('search', 'Rsv\Manager::search');
+    $routes->post('quote', 'Rsv\Quote::index');
+    $routes->get('discountcodes', 'Rsv\DiscountCodes::index');
+    $routes->get('dbtest', 'Dbtest::index');
+    $routes->get('viewConf', 'Dbtest::conf');
+
+});
+
+// Upload CSV
+$routes->group('csv', function($routes){
+    $routes->get('upload', 'CsvUpload::upload');
+    $routes->post('upload', 'CsvUpload::upload');
+});
 
 // Rutas de logueo
 $routes->group('login', function($routes){

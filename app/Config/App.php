@@ -16,7 +16,7 @@ class App extends BaseConfig
      *
      *    http://example.com/
      */
-    public string $baseURL = 'http://api.geoshglobal.com/apirest-ci/';
+    public string $baseURL = 'https://api.geoshglobal.com/apirest-ci/';
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.

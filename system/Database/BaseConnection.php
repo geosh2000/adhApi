@@ -464,6 +464,74 @@ abstract class BaseConnection implements ConnectionInterface
         return $this->connect(true);
     }
 
+    public function insert_on_duplicate_update_batch($table = '', $set = NULL)
+  {
+    if ( ! is_null($set))
+    {
+     $this->set_insert_batch($set);
+    }
+
+    if (count($this->qb_set) == 0)
+    {
+     if ($this->db_debug)
+     {
+      //No valid data array.  Folds in cases where keys and values did not match up
+      return $this->display_error('db_must_use_set');
+     }
+     return FALSE;
+    }
+
+    if ($table == '')
+    {
+     if ( ! isset($this->qb_from[0]))
+     {
+      if ($this->db_debug)
+      {
+       return $this->display_error('db_must_set_table');
+      }
+      return FALSE;
+     }
+
+     $table = $this->qb_from[0];
+    }
+
+    // Batch this baby
+    for ($i = 0, $total = count($this->qb_set); $i < $total; $i = $i + 100)
+    {
+
+     $sql = $this->_insert_on_duplicate_update_batch($table, $this->qb_keys, array_slice($this->qb_set, $i, 100));
+
+     // echo $sql;
+
+     $this->query($sql);
+    }
+
+    $this->_reset_write();
+
+
+    return TRUE;
+  }
+
+  /**
+   * Insert_on_duplicate_update_batch statement
+   *
+   * Generates a platform-specific insert string from the supplied data
+   * MODIFIED to include ON DUPLICATE UPDATE
+   *
+   * @access public
+   * @param string the table name
+   * @param array the insert keys
+   * @param array the insert values
+   * @return string
+   */
+  private function _insert_on_duplicate_update_batch($table, $keys, $values)
+  {
+    foreach($keys as $key)
+     $update_fields[] = $key.'=VALUES('.$key.')';
+
+    return "INSERT INTO ".$table." (".implode(', ', $keys).") VALUES ".implode(', ', $values)." ON DUPLICATE KEY UPDATE ".implode(', ', $update_fields);
+  }
+
     /**
      * Returns the actual connection object. If both a 'read' and 'write'
      * connection has been specified, you can pass either term in to
